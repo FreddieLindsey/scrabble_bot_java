@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Board {
 
@@ -12,24 +13,39 @@ public class Board {
   private final Long width;
   private final Long height;
   private final HashMap<Character, Integer> character_scoring;
+  private final Long tilesTotal;
+  private final Long tilesEach;
+
   private final JSONObject boardInfo;
 
   public Board(JSONObject boardInfo) throws BoardInfoException {
     this.boardInfo = boardInfo;
     validateBoardInformation();
 
+    // Entries in map
+    JSONObject tiles = ((JSONObject) boardInfo.get("tiles"));
+    JSONObject scores = ((JSONObject) boardInfo.get("scores"));
+
     this.name = (String) boardInfo.get("board_name");
     this.width = (Long) boardInfo.get("board_width");
     this.height = (Long) boardInfo.get("board_height");
-    this.boardMarkers = new BoardMarker[width.intValue()][height.intValue()];
+    this.boardMarkers = new BoardMarker[ width.intValue() ][ height.intValue() ];
+
+    this.tilesTotal = (Long) tiles.get("total");
+    this.tilesEach = (Long) tiles.get("each");
+
     this.character_scoring = new HashMap<>();
+
+    for (char c = 'a'; c <= 'z'; c++) {
+      this.character_scoring.put(c, ((Long) scores.get(String.valueOf(c))).intValue());
+    }
 
     generateBoard();
   }
 
   private void validateBoardInformation() throws BoardInfoException {
     String[] properties = new String[]{
-      "board_name", "board_width", "board_height"
+      "board_name", "board_width", "board_height", "tiles"
     };
 
     for (String p : properties) {
