@@ -1,13 +1,6 @@
 package scrabblebot.board;
 
-import com.oracle.javafx.jmx.json.JSONDocument;
-import com.oracle.javafx.jmx.json.JSONReader;
 import org.json.simple.JSONObject;
-import sun.org.mozilla.javascript.internal.json.JsonParser;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public enum DefaultBoards {
 

@@ -1,7 +1,12 @@
 package scrabblebot.board;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import scrabblebot.board.items.BoardMarker;
+import scrabblebot.board.items.Modifier;
+import scrabblebot.utils.ScrabbleFunction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,14 +62,47 @@ public class Board {
     }
   }
 
-  private void applyModifiers(List<Modifier> modifiers) {
-    System.out.println("TODO: Applying modifiers");
-  }
-
   private void generateBoard() {
+    // Initialise board markers
     for (int i = 0; i < boardMarkers.length; i++) {
       for (int j = 0; j < boardMarkers.length; j++) {
         boardMarkers[i][j] = new BoardMarker();
+      }
+    }
+
+    // Apply modifiers to board markers
+    JSONObject modifiers = (JSONObject) boardInfo.get("modifiers");
+    if (modifiers != null) {
+      for (Object item : modifiers.entrySet()) {
+        Map.Entry<String, JSONArray> kv = (Map.Entry<String, JSONArray>) item;
+
+        String type = kv.getKey();
+        ScrabbleFunction f = ScrabbleFunctions.DEFAULT;
+        switch (type) {
+          case "double_w":
+            f = ScrabbleFunctions.DOUBLE_W;
+            break;
+
+          case "triple_w":
+            f = ScrabbleFunctions.TRIPLE_W;
+            break;
+
+          case "double_l":
+            f = ScrabbleFunctions.DOUBLE_L;
+            break;
+
+          case "triple_l":
+            f = ScrabbleFunctions.TRIPLE_L;
+            break;
+        }
+        Modifier m = new Modifier(type, f);
+
+        for (Object o : kv.getValue()) {
+          JSONObject coords = (JSONObject) o;
+          Long x = (Long) coords.get("x");
+          Long y = (Long) coords.get("y");
+          boardMarkers[ x.intValue() - 1 ][ y.intValue() - 1 ].applyModifier(m);
+        }
       }
     }
   }
